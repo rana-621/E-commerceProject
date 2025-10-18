@@ -1,5 +1,6 @@
 ﻿using Ecom.Core.Entities.Product;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Ecom.Infrastructure.Data;
 
@@ -16,5 +17,6 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
