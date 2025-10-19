@@ -29,19 +29,31 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public async Task<IReadOnlyList<T>> GetAllAsync()
         => await _context.Set<T>().AsNoTracking().ToListAsync();
 
-    public Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+    public async Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
     {
-        throw new NotImplementedException();
+        var query = _context.Set<T>().AsQueryable();
+        foreach (var item in includes)
+        {
+            query = query.Include(item);
+        }
+        return await query.ToListAsync();
     }
 
-    public Task<T> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var entity = await _context.Set<T>().FindAsync(id);
+        return entity;
     }
 
     public Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
     {
-        throw new NotImplementedException();
+        IQueryable<T> query = _context.Set<T>();
+        foreach (var item in includes)
+        {
+            query = query.Include(item);
+        }
+        var entity = query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        return entity;
     }
 
     public Task UpdateAsync(T entity)
