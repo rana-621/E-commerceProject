@@ -13,6 +13,7 @@ public static class infrastructureRegisteration
         //services.AddScoped
         //services.AddSingleton
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         return services;
     }
 }
