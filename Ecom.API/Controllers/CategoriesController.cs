@@ -25,5 +25,33 @@ namespace Ecom.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("get-by-id/{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            try
+            {
+                var category = await unitOfWork.CategoryRepository.GetByIdAsync(id);
+                if (category is null)
+                    return BadRequest();
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("add-category")]
+        public async Task<IActionResult> AddCategory([FromBody] CategoryDTO category)
+        {
+            try
+            {
+                await unitOfWork.CategoryRepository.AddAsync(category);
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
