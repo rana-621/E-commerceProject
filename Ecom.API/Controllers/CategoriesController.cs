@@ -1,4 +1,6 @@
-﻿using Ecom.Core.Interfaces;
+﻿using Ecom.Core.DTOs;
+using Ecom.Core.Entities.Product;
+using Ecom.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecom.API.Controllers
@@ -41,12 +43,49 @@ namespace Ecom.API.Controllers
             }
         }
         [HttpPost("add-category")]
-        public async Task<IActionResult> AddCategory([FromBody] CategoryDTO category)
+        public async Task<IActionResult> AddCategory(AddCategoryDTO categoryDto)
         {
             try
             {
+                var category = new Category()
+                {
+                    Name = categoryDto.Name,
+                    Description = categoryDto.Description
+                };
                 await unitOfWork.CategoryRepository.AddAsync(category);
-                return Ok(category);
+                return Ok(new { message = "Item has been added sucessfully! " });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("update-category/{id}")]
+        public async Task<IActionResult> UpdateCategory(UpdateCategoryDTO categoryDto)
+        {
+            try
+            {
+                var category = new Category()
+                {
+                    Id = categoryDto.Id,
+                    Name = categoryDto.Name,
+                    Description = categoryDto.Description
+                };
+                await unitOfWork.CategoryRepository.UpdateAsync(category);
+                return Ok(new { message = "Item has been updated sucessfully! " });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("delete-category/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                await unitOfWork.CategoryRepository.DeleteAsync(id);
+                return Ok(new { message = "Item has been deleted sucessfully! " });
             }
             catch (Exception ex)
             {
