@@ -1,4 +1,5 @@
-﻿using Ecom.Core.DTOs;
+﻿using AutoMapper;
+using Ecom.Core.DTOs;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace Ecom.API.Controllers
 
     public class CategoriesController : BaseController
     {
-        public CategoriesController(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public CategoriesController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
         }
 
@@ -47,11 +48,7 @@ namespace Ecom.API.Controllers
         {
             try
             {
-                var category = new Category()
-                {
-                    Name = categoryDto.Name,
-                    Description = categoryDto.Description
-                };
+                var category = mapper.Map<Category>(categoryDto);
                 await unitOfWork.CategoryRepository.AddAsync(category);
                 return Ok(new { message = "Item has been added sucessfully! " });
             }
@@ -65,12 +62,7 @@ namespace Ecom.API.Controllers
         {
             try
             {
-                var category = new Category()
-                {
-                    Id = categoryDto.Id,
-                    Name = categoryDto.Name,
-                    Description = categoryDto.Description
-                };
+                var category = mapper.Map<Category>(categoryDto);
                 await unitOfWork.CategoryRepository.UpdateAsync(category);
                 return Ok(new { message = "Item has been updated sucessfully! " });
             }
