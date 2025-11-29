@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecom.API.Helper;
+using Ecom.Core.DTOs;
 using Ecom.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +19,11 @@ namespace Ecom.API.Controllers
             {
                 var products = await unitOfWork.ProductRepository
                     .GetAllAsync(x => x.Category, x => x.photos);
+
+                var result = mapper.Map<List<ProductDTO>>(products);
                 if (products is null)
                     return BadRequest(new ResponseAPI(400));
-                return Ok(products);
+                return Ok(result);
             }
             catch (Exception ex)
             {
