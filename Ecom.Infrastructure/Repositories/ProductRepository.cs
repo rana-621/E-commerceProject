@@ -2,6 +2,7 @@
 using Ecom.Core.DTOs;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.Interfaces;
+using Ecom.Core.Services;
 using Ecom.Infrastructure.Data;
 
 namespace Ecom.Infrastructure.Repositories;
@@ -10,10 +11,12 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
-    public ProductRepository(AppDbContext context, IMapper mapper) : base(context)
+    private readonly IImageManagementService _imageManagementService;
+    public ProductRepository(AppDbContext context, IMapper mapper, IImageManagementService imageManagementService) : base(context)
     {
         _context = context;
         _mapper = mapper;
+        _imageManagementService = imageManagementService;
     }
 
     public async Task<bool> AddAsync(AddProductDTO productDTO)
