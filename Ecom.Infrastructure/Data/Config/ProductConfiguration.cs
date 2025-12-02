@@ -12,11 +12,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
         builder.Property(x => x.Description)
             .IsRequired();
-        builder.Property(x => x.Price)
+        builder.Property(x => x.NewPrice)
             .HasColumnType("decimal(18,2)");
         builder.HasData(
             new Product
-            { Id = 1, Name = "test", Description = "test", Price = 12, CategoryId = 1 }
+            { Id = 1, Name = "test", Description = "test", NewPrice = 12, CategoryId = 1 }
             );
 
 

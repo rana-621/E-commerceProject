@@ -13,5 +13,9 @@ public class ProductMapping : Profile
            op => op.MapFrom(src => src.Category.Name)).ReverseMap();
 
         CreateMap<Photo, PhotoDTO>().ReverseMap();
+        CreateMap<AddProductDTO, Product>()
+            .ForMember(x => x.photos, op => op.Ignore())
+            .ReverseMap();
+
     }
 }

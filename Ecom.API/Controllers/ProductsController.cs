@@ -47,5 +47,18 @@ namespace Ecom.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("add-product")]
+        public async Task<IActionResult> AddProduct(ProductDTO productDto)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
     }
-}
