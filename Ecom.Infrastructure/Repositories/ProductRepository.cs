@@ -27,5 +27,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         var product = _mapper.Map<Product>(productDTO);
         await _context.Products.AddAsync(product);
         await _context.SaveChangesAsync();
+
+        var imagePath = await _imageManagementService.AddImageAsync(productDTO.Photo, productDTO.Name);
     }
 }
