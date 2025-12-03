@@ -1,6 +1,8 @@
 ﻿using Ecom.Core.Interfaces;
+using Ecom.Core.Services;
 using Ecom.Infrastructure.Data;
 using Ecom.Infrastructure.Repositories;
+using Ecom.Infrastructure.Repositories.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,7 @@ public static class infrastructureRegisteration
     {
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IImageManagementService, ImageManagementService>();
         services.AddDbContext<AppDbContext>(op =>
         {
             op.UseSqlServer(configuration.GetConnectionString("EcomDatabase"));

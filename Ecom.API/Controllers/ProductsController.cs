@@ -2,14 +2,17 @@
 using Ecom.API.Helper;
 using Ecom.Core.DTOs;
 using Ecom.Core.Interfaces;
+using Ecom.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecom.API.Controllers
 {
     public class ProductsController : BaseController
     {
-        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+        private readonly IImageManagementService _imageManagementService;
+        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IImageManagementService imageManagementService) : base(unitOfWork, mapper)
         {
+            _imageManagementService = imageManagementService;
         }
 
         [HttpGet("get-all")]
@@ -49,16 +52,18 @@ namespace Ecom.API.Controllers
         }
 
         [HttpPost("add-product")]
-        public async Task<IActionResult> AddProduct(ProductDTO productDto)
+        public async Task<IActionResult> AddProduct(AddProductDTO productDto)
         {
             try
             {
-
+                await unitOfWork.ProductRepository.AddAsync(productDto);
+                return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseAPI(400, ex.Message));
             }
 
         }
     }
+}

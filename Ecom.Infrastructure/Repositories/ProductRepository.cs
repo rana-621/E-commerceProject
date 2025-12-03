@@ -29,5 +29,14 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         await _context.SaveChangesAsync();
 
         var imagePath = await _imageManagementService.AddImageAsync(productDTO.Photo, productDTO.Name);
+        var photo = imagePath.Select(path => new Photo
+        {
+            ImageName = path,
+            ProductId = product.Id
+        }).ToList();
+        await _context.Photos.AddRangeAsync(photo);
+        await _context.SaveChangesAsync();
+        return true;
+
     }
 }

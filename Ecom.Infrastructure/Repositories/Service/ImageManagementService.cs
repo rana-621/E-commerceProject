@@ -44,8 +44,10 @@ public class ImageManagementService : IImageManagementService
 
     public void DeleteImageAsync(string src)
     {
-        var info = _fileProvider.GetFileInfo(src);
+        IFileInfo? info = _fileProvider.GetFileInfo(src);
         var root = info.PhysicalPath;
-        File.Delete(info.PhysicalPath);
+        File.Delete(root);
+
+
     }
 }
