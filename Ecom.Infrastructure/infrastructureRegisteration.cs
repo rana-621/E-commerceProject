@@ -6,6 +6,7 @@ using Ecom.Infrastructure.Repositories.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ecom.Infrastructure;
 
@@ -16,6 +17,8 @@ public static class infrastructureRegisteration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IImageManagementService, ImageManagementService>();
+        services.AddSingleton<IFileProvider>(
+new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
         services.AddDbContext<AppDbContext>(op =>
         {
             op.UseSqlServer(configuration.GetConnectionString("EcomDatabase"));

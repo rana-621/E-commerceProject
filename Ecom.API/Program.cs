@@ -1,5 +1,4 @@
 using Ecom.Infrastructure;
-using Microsoft.Extensions.FileProviders;
 
 namespace Ecom.API
 {
@@ -15,11 +14,6 @@ namespace Ecom.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<IFileProvider>(
-    new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
-    )
-);
             builder.Services.infrastructureConfiguration(builder.Configuration);
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
