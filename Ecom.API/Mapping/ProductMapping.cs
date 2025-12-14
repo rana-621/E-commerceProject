@@ -17,5 +17,8 @@ public class ProductMapping : Profile
             .ForMember(x => x.photos, op => op.Ignore())
             .ReverseMap();
 
+        CreateMap<UpdateProductDTO, Product>()
+            .ForMember(x => x.photos, op => op.Ignore())
+            .ReverseMap();
     }
 }

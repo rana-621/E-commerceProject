@@ -4,6 +4,7 @@ using Ecom.Core.Entities.Product;
 using Ecom.Core.Interfaces;
 using Ecom.Core.Services;
 using Ecom.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Infrastructure.Repositories;
 
@@ -38,5 +39,40 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         await _context.SaveChangesAsync();
         return true;
 
+    }
+
+    public async Task<bool> UpdateAsync(UpdateProductDTO updateproductDTO)
+    {
+        if (updateproductDTO is null)
+        {
+            return false;
+        }
+        var findProduct = await _context.Products.Include(m => m.Category)
+            .Include(m => m.photos)
+            .FirstOrDefaultAsync(p => p.Id == updateproductDTO.Id);
+        if (findProduct is null)
+        {
+            return false;
+        }
+        _mapper.Map(updateproductDTO, findProduct);
+
+        var findPhoto = await _context.Photos.Where(p => p.ProductId == updateproductDTO.Id).ToListAsync();
+        _context.Photos.RemoveRange(findPhoto);
+        foreach (var item in findPhoto)
+        {
+            _imageManagementService.DeleteImageAsync(item.ImageName);
+        }
+        _context.Photos.RemoveRange(findPhoto);
+
+        var imagePath = await _imageManagementService.AddImageAsync(updateproductDTO.Photo, updateproductDTO.Name);
+        var photo = imagePath.Select(path => new Photo
+        {
+            ImageName = path,
+            ProductId = updateproductDTO.Id
+        }).ToList();
+
+        await _context.Photos.AddRangeAsync(photo);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

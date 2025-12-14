@@ -27,3 +27,8 @@ public record AddProductDTO
 
     public IFormFileCollection Photo { get; set; }
 }
+
+public record UpdateProductDTO : AddProductDTO
+{
+    public int Id { get; set; }
+}
