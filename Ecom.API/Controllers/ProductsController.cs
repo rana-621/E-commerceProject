@@ -5,98 +5,97 @@ using Ecom.Core.Interfaces;
 using Ecom.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecom.API.Controllers
+namespace Ecom.API.Controllers;
+
+public class ProductsController : BaseController
 {
-    public class ProductsController : BaseController
+    private readonly IImageManagementService _imageManagementService;
+    public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IImageManagementService imageManagementService) : base(unitOfWork, mapper)
     {
-        private readonly IImageManagementService _imageManagementService;
-        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IImageManagementService imageManagementService) : base(unitOfWork, mapper)
+        _imageManagementService = imageManagementService;
+    }
+
+    [HttpGet("get-all")]
+    public async Task<IActionResult> GetAllProducts()
+    {
+        try
         {
-            _imageManagementService = imageManagementService;
+            var products = await unitOfWork.ProductRepository
+                .GetAllAsync(x => x.Category, x => x.photos);
+
+            var result = mapper.Map<List<ProductDTO>>(products);
+            if (products is null)
+                return BadRequest(new ResponseAPI(400));
+            return Ok(result);
         }
-
-        [HttpGet("get-all")]
-        public async Task<IActionResult> GetAllProducts()
+        catch (Exception ex)
         {
-            try
-            {
-                var products = await unitOfWork.ProductRepository
-                    .GetAllAsync(x => x.Category, x => x.photos);
-
-                var result = mapper.Map<List<ProductDTO>>(products);
-                if (products is null)
-                    return BadRequest(new ResponseAPI(400));
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return BadRequest(ex.Message);
         }
+    }
 
-        [HttpGet("get-by-id/{id}")]
-        public async Task<IActionResult> GetById(int id)
+    [HttpGet("get-by-id/{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        try
         {
-            try
-            {
-                var product = await unitOfWork.ProductRepository.GetByIdAsync(id, x => x.Category, x => x.photos);
-                var result = mapper.Map<ProductDTO>(product);
-                if (product is null)
-                    return BadRequest(new ResponseAPI(400, "Product not found"));
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var product = await unitOfWork.ProductRepository.GetByIdAsync(id, x => x.Category, x => x.photos);
+            var result = mapper.Map<ProductDTO>(product);
+            if (product is null)
+                return BadRequest(new ResponseAPI(400, "Product not found"));
+            return Ok(result);
         }
-
-        [HttpPost("add-product")]
-        public async Task<IActionResult> AddProduct(AddProductDTO productDto)
+        catch (Exception ex)
         {
-            try
-            {
-                await unitOfWork.ProductRepository.AddAsync(productDto);
-                return Ok(new ResponseAPI(200));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseAPI(400, ex.Message));
-            }
-
+            return BadRequest(ex.Message);
         }
+    }
 
-        [HttpPut("update-product")]
-        public async Task<IActionResult> UpdateProduct(UpdateProductDTO updateproductDTO)
+    [HttpPost("add-product")]
+    public async Task<IActionResult> AddProduct(AddProductDTO productDto)
+    {
+        try
         {
-            try
-            {
-                await unitOfWork.ProductRepository.UpdateAsync(updateproductDTO);
-                return Ok(new ResponseAPI(200));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseAPI(400, ex.Message));
-            }
+            await unitOfWork.ProductRepository.AddAsync(productDto);
+            return Ok(new ResponseAPI(200));
         }
-
-        [HttpDelete("delete-product/{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                var product = await unitOfWork.ProductRepository
-                    .GetByIdAsync(id, m => m.photos, m => m.Category);
-
-                await unitOfWork.ProductRepository.DeleteAsync(product);
-                return Ok(new ResponseAPI(200));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseAPI(400, ex.Message));
-
-            }
+            return BadRequest(new ResponseAPI(400, ex.Message));
         }
 
     }
+
+    [HttpPut("update-product")]
+    public async Task<IActionResult> UpdateProduct(UpdateProductDTO updateproductDTO)
+    {
+        try
+        {
+            await unitOfWork.ProductRepository.UpdateAsync(updateproductDTO);
+            return Ok(new ResponseAPI(200));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ResponseAPI(400, ex.Message));
+        }
+    }
+
+    [HttpDelete("delete-product/{id}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        try
+        {
+            var product = await unitOfWork.ProductRepository
+                .GetByIdAsync(id, m => m.photos, m => m.Category);
+
+            await unitOfWork.ProductRepository.DeleteAsync(product);
+            return Ok(new ResponseAPI(200));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ResponseAPI(400, ex.Message));
+
+        }
+    }
+
 }
