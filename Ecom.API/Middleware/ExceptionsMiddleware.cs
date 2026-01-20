@@ -7,10 +7,14 @@ namespace Ecom.API.Middleware;
 public class ExceptionsMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IHostEnvironment _hostEnvironment;
 
-    public ExceptionsMiddleware(RequestDelegate next)
+
+
+    public ExceptionsMiddleware(RequestDelegate next, IHostEnvironment hostEnvironment)
     {
         _next = next;
+        _hostEnvironment = hostEnvironment;
     }
     public async Task InvokeAsync(HttpContext context)
     {
@@ -22,7 +26,12 @@ public class ExceptionsMiddleware
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
-            var response = new ApiExceptions((int)HttpStatusCode.InternalServerError, ex.Message, ex.StackTrace);
+
+
+            var response = _hostEnvironment.IsDevelopment() ?
+                new ApiExceptions((int)HttpStatusCode.InternalServerError, ex.Message, ex.StackTrace)
+                 : new ApiExceptions((int)HttpStatusCode.InternalServerError, ex.Message);
+
             var json = JsonSerializer.Serialize(response);
             context.Response.WriteAsync(json);
         }

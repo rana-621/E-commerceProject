@@ -1,3 +1,4 @@
+using Ecom.API.Middleware;
 using Ecom.Infrastructure;
 
 namespace Ecom.API
@@ -25,6 +26,7 @@ namespace Ecom.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseMiddleware<ExceptionsMiddleware>();
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
             app.UseHttpsRedirection();
