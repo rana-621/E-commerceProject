@@ -20,10 +20,23 @@ public class ExceptionsMiddleware
     }
     public async Task InvokeAsync(HttpContext context)
     {
+
         try
         {
+
+            if (IsRequestAllowed(context) == false)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
+                context.Response.ContentType = "application/json";
+
+                var response = new ApiExceptions((int)HttpStatusCode.TooManyRequests, "Too many requests. Please try again later.");
+
+                await context.Response.WriteAsJsonAsync(response);
+
+            }
             await _next(context);
         }
+
         catch (Exception ex)
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
