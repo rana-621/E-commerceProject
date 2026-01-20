@@ -23,6 +23,7 @@ public class ExceptionsMiddleware
 
         try
         {
+            ApplySecurity(context);
 
             if (IsRequestAllowed(context) == false)
             {
@@ -81,6 +82,13 @@ public class ExceptionsMiddleware
 
         }
         return true;
+    }
+
+    public void ApplySecurity(HttpContext context)
+    {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+        context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
     }
 
 }
