@@ -1,4 +1,5 @@
 ﻿using Ecom.API.Helper;
+using Microsoft.Extensions.Caching.Memory;
 using System.Net;
 using System.Text.Json;
 
@@ -8,13 +9,14 @@ public class ExceptionsMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IMemoryCache _memoryCache;
+    private readonly TimeSpan _rateLimitWindow = TimeSpan.FromSeconds(30);
 
-
-
-    public ExceptionsMiddleware(RequestDelegate next, IHostEnvironment hostEnvironment)
+    public ExceptionsMiddleware(RequestDelegate next, IHostEnvironment hostEnvironment, IMemoryCache memoryCache)
     {
         _next = next;
         _hostEnvironment = hostEnvironment;
+        _memoryCache = memoryCache;
     }
     public async Task InvokeAsync(HttpContext context)
     {
@@ -36,4 +38,36 @@ public class ExceptionsMiddleware
             context.Response.WriteAsync(json);
         }
     }
+
+    public bool IsRequestAllowed(HttpContext context)
+    {
+        var ip = context.Connection.RemoteIpAddress.ToString();
+        var cachKey = $"Rate: {ip}";
+        var dateNow = DateTime.Now;
+
+        var (timesTamp, count) = _memoryCache.GetOrCreate(cachKey, entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = _rateLimitWindow;
+            return (timesTamp: dateNow, count: 0);
+
+        });
+
+        if (dateNow - timesTamp < _rateLimitWindow)
+        {
+            if (count >= 8)
+            {
+                return false;
+            }
+
+            _memoryCache.Set(cachKey, (timesTamp, count += 1), _rateLimitWindow);
+
+        }
+        else
+        {
+            _memoryCache.Set(cachKey, (timesTamp, count), _rateLimitWindow);
+
+        }
+        return true;
+    }
+
 }
