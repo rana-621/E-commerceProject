@@ -17,14 +17,14 @@ public class ProductsController : BaseController
     }
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAllProducts(ProductParams productParams)
+    public async Task<IActionResult> GetAllProducts([FromQuery] ProductParams productParams)
     {
         try
         {
             var products = await unitOfWork.ProductRepository
                 .GetAllAsync(productParams);
-
-            return Ok(products);
+            var totalCount = await unitOfWork.ProductRepository.CountAsync();
+            return Ok(new Pagination<ProductDTO>(productParams.PageNumber, productParams.pageSize, totalCount, products));
         }
         catch (Exception ex)
         {

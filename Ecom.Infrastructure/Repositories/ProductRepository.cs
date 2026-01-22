@@ -5,7 +5,6 @@ using Ecom.Core.Interfaces;
 using Ecom.Core.Services;
 using Ecom.Core.Sharing;
 using Ecom.Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Infrastructure.Repositories;
@@ -23,7 +22,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     }
 
 
-    public async Task<IEnumerable<ProductDTO>> GetAllAsync([FromQuery] ProductParams productParams)
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync(ProductParams productParams)
     {
         var query = _context.Products
             .Include(m => m.Category)
