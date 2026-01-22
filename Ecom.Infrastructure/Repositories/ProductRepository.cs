@@ -3,7 +3,9 @@ using Ecom.Core.DTOs;
 using Ecom.Core.Entities.Product;
 using Ecom.Core.Interfaces;
 using Ecom.Core.Services;
+using Ecom.Core.Sharing;
 using Ecom.Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Infrastructure.Repositories;
@@ -21,7 +23,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     }
 
 
-    public async Task<IEnumerable<ProductDTO>> GetAllAsync(string sort, int? categoryId, int pageSize, int pageNumber)
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync([FromQuery] ProductParams productParams)
     {
         var query = _context.Products
             .Include(m => m.Category)
@@ -29,13 +31,13 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .AsNoTracking();
 
         //Filter by category
-        if (categoryId.HasValue)
-            query = query.Where(p => p.CategoryId == categoryId);
+        if (productParams.CategoryId.HasValue)
+            query = query.Where(p => p.CategoryId == productParams.CategoryId);
 
 
-        if (!string.IsNullOrEmpty(sort))
+        if (!string.IsNullOrEmpty(productParams.Sort))
         {
-            query = sort switch
+            query = productParams.Sort switch
             {
                 "price_asc" => query.OrderBy(p => p.NewPrice),
                 "price_desc" => query.OrderByDescending(p => p.NewPrice),
@@ -43,10 +45,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             };
         }
 
-        pageNumber = pageNumber > 0 ? pageNumber : 1;
-        pageSize = pageSize > 0 ? pageSize : 3;
-
-        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+        query = query.Skip((productParams.PageNumber - 1) * productParams.pageSize).Take(productParams.pageSize);
 
         var result = _mapper.Map<List<ProductDTO>>(query);
         return result;

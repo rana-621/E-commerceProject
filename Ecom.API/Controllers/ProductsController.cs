@@ -3,6 +3,7 @@ using Ecom.API.Helper;
 using Ecom.Core.DTOs;
 using Ecom.Core.Interfaces;
 using Ecom.Core.Services;
+using Ecom.Core.Sharing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecom.API.Controllers;
@@ -16,12 +17,12 @@ public class ProductsController : BaseController
     }
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAllProducts(string? sort, int? categoryId, int pageSize, int pageNumber)
+    public async Task<IActionResult> GetAllProducts(ProductParams productParams)
     {
         try
         {
             var products = await unitOfWork.ProductRepository
-                .GetAllAsync(sort, categoryId, pageSize, pageNumber);
+                .GetAllAsync(productParams);
 
             return Ok(products);
         }
