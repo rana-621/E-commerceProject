@@ -6,7 +6,8 @@ public record ProductDTO
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public decimal Price { get; set; }
+    public decimal NewPrice { get; set; }
+    public decimal OldPrice { get; set; }
     public virtual List<PhotoDTO> Photos { get; set; } = new();
     public string CategoryName { get; set; } = string.Empty;
 

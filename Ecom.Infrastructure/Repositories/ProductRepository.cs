@@ -20,6 +20,34 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         _imageManagementService = imageManagementService;
     }
 
+
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync(string sort)
+    {
+        var query = _context.Products
+            .Include(m => m.Category)
+            .Include(m => m.photos)
+            .AsNoTracking();
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            switch (sort)
+            {
+                case "price_asc":
+                    query = query.OrderBy(p => p.NewPrice);
+                    break;
+                case "price_desc":
+                    query = query.OrderByDescending(p => p.NewPrice);
+                    break;
+                default:
+                    query = query.OrderBy(p => p.Name);
+                    break;
+            }
+
+        }
+
+        var result = _mapper.Map<List<ProductDTO>>(query);
+        return result;
+    }
     public async Task<bool> AddAsync(AddProductDTO productDTO)
     {
         if (productDTO == null)
