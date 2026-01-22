@@ -21,7 +21,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     }
 
 
-    public async Task<IEnumerable<ProductDTO>> GetAllAsync(string sort, int? categoryId)
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync(string sort, int? categoryId, int pageSize, int pageNumber)
     {
         var query = _context.Products
             .Include(m => m.Category)
@@ -35,20 +35,18 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 
         if (!string.IsNullOrEmpty(sort))
         {
-            switch (sort)
+            query = sort switch
             {
-                case "price_asc":
-                    query = query.OrderBy(p => p.NewPrice);
-                    break;
-                case "price_desc":
-                    query = query.OrderByDescending(p => p.NewPrice);
-                    break;
-                default:
-                    query = query.OrderBy(p => p.Name);
-                    break;
-            }
-
+                "price_asc" => query.OrderBy(p => p.NewPrice),
+                "price_desc" => query.OrderByDescending(p => p.NewPrice),
+                _ => query.OrderBy(p => p.Name),
+            };
         }
+
+        pageNumber = pageNumber > 0 ? pageNumber : 1;
+        pageSize = pageSize > 0 ? pageSize : 3;
+
+        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
         var result = _mapper.Map<List<ProductDTO>>(query);
         return result;
