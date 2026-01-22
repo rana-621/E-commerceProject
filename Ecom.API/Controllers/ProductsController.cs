@@ -16,12 +16,12 @@ public class ProductsController : BaseController
     }
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAllProducts(string? sort)
+    public async Task<IActionResult> GetAllProducts(string? sort, int? categoryId)
     {
         try
         {
             var products = await unitOfWork.ProductRepository
-                .GetAllAsync(sort);
+                .GetAllAsync(sort, categoryId);
 
             return Ok(products);
         }
