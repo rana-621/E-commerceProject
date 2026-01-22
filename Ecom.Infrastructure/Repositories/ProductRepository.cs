@@ -29,6 +29,21 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .Include(m => m.photos)
             .AsNoTracking();
 
+        //filtering by word(searching)
+
+        if (!string.IsNullOrEmpty(productParams.Search))
+        {
+            //query = query.Where(m => m.Name.ToLower().Contains(productParams.Search.ToLower()) ||
+            //                       m.Description.ToLower().Contains(productParams.Search.ToLower()));
+
+
+            var searchWords = productParams.Search.Split(' ');
+            query = query.Where(m => searchWords.All(word =>
+            m.Name.ToLower().Contains(word.ToLower()) ||
+            m.Description.ToLower().Contains(word.ToLower())
+            ));
+        }
+
         //Filter by category
         if (productParams.CategoryId.HasValue)
             query = query.Where(p => p.CategoryId == productParams.CategoryId);

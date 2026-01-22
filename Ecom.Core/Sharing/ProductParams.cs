@@ -5,7 +5,9 @@ public class ProductParams
     //string sort, int? categoryId, int pageSize, int pageNumber
     public string Sort { get; set; } = string.Empty;
     public int? CategoryId { get; set; }
+    public string Search { get; set; } = string.Empty;
     public int MaxPageSize { get; set; } = 6;
+
     private int _pageSize;
 
     public int pageSize
